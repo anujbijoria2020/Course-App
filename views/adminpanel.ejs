@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard - Uploaded Courses</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f9fc;
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background-color: #2c3e50;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    /* Plus Button */
+    .add-course-btn {
+      background-color: #27ae60;
+      border: none;
+      color: white;
+      font-size: 28px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(39, 174, 96, 0.5);
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+    }
+
+    .add-course-btn:hover {
+      background-color: #219150;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .course-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+    }
+
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .course-image {
+      width: 100%;
+      height: 140px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 15px;
+      background-color: #ddd;
+    }
+
+    .course-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .course-description {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 15px;
+      flex-grow: 1;
+    }
+
+    .course-price {
+      font-weight: 700;
+      color: #27ae60;
+      margin-bottom: 15px;
+    }
+
+    .course-valid{
+ font-weight: 700;
+      color: #27ae60;
+      margin-bottom: 15px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s ease;
+      color: white;
+      text-align: center;
+      user-select: none;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn.edit {
+      background-color: #2980b9;
+    }
+
+    .btn.edit:hover {
+      background-color: #1c5985;
+    }
+
+    .btn.unpublish {
+      background-color: #c0392b;
+    }
+
+    .btn.unpublish:hover {
+      background-color: #822419;
+    }
+  </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+  <header>
+    <h1>Uploaded Courses</h1>
+    <a  class="add-course-btn" title="Add New Course" onclick="addCourse()">+</a>
+  </header>
+
+  <main>
+    
+    <!-- <article class="course-card">
+      <img src="https://via.placeholder.com/400x140?text=JS+Basics" alt="JS Basics" class="course-image" />
+      <h2 class="course-title">JavaScript Basics</h2>
+      <p class="course-description">Learn the fundamentals of JavaScript programming language.</p>
+      <p class="course-price">$49</p>
+      <div class="buttons">
+        <a href="/admin/courses/edit" class="btn edit">Edit</a>
+          <button type="submit" class="btn unpublish">Unpublish</button>
+      </div>
+    </article> -->
+
+  </main>
+
+</body>
+<script>
+async function fetchCourse(){
+
+  const token = localStorage.getItem("token");
+if(!token){
+ return  window.location.href = "/admin";
+}
+try{
+const res = await axios.get("http://localhost:3000/admin/course/view",{
+  headers:{
+    "token":token,
+    "content-type":"application/json"
+  }
+});
+
+  const courseArray = res.data.courses;
+  console.log(courseArray);
+      const main = document.querySelector("main");
+
+      courseArray.forEach(course => {
+        // Create main article
+        const articleEl = document.createElement("article");
+        articleEl.setAttribute("class", "course-card");
+
+        // Image
+        const imgEl = document.createElement("img");
+        imgEl.setAttribute("class", "course-image");
+        imgEl.setAttribute("alt", course.title);
+        imgEl.setAttribute("src", "https://img.freepik.com/free-vector/laptop-with-program-code-isometric-icon-software-development-programming-applications-dark-neon_39422-971.jpg?ga=GA1.1.401802642.1716019925&semt=ais_hybrid&w=740");
+
+        // Title
+        const h2El = document.createElement("h2");
+        h2El.setAttribute("class", "course-title");
+        h2El.innerText = course.title;
+
+        // Description
+        const descEl = document.createElement("p");
+        descEl.setAttribute("class", "course-description");
+        descEl.innerText = course.description;
+
+        const validity = document.createElement("span");
+        validity.setAttribute("class", "course-valid");
+        descEl.innerText = `IsPublished = ${course.IsPublished}`;
+
+        // Price
+        const priceEl = document.createElement("p");
+        priceEl.setAttribute("class", "course-price");
+        priceEl.innerText = `$${course.price}`;
+
+        // Button container
+        const buttonsDiv = document.createElement("div");
+        buttonsDiv.setAttribute("class", "buttons");
+
+        // Edit button
+        const editBtn = document.createElement("a");
+        editBtn.setAttribute("href", `/admin/courses/edit/${course._id}`);
+        editBtn.setAttribute("class", "btn edit");
+        editBtn.innerText = "Edit";
+
+        // Unpublish button
+        const unpubBtn = document.createElement("button");
+        unpubBtn.setAttribute("class", "btn unpublish");
+        unpubBtn.setAttribute("type", "submit");
+        unpubBtn.setAttribute("onclick", `unpublish(${course._id})`);
+        unpubBtn.innerText = "Unpublish";
+
+        // Append buttons
+        buttonsDiv.appendChild(editBtn);
+        buttonsDiv.appendChild(unpubBtn);
+
+        // Append all to article
+        articleEl.appendChild(imgEl);
+        articleEl.appendChild(h2El);
+        articleEl.appendChild(descEl);
+        articleEl.appendChild(priceEl);
+        articleEl.appendChild(buttonsDiv);
+
+        // Append article to main
+        main.appendChild(articleEl);
+
+  //edit button
+    editBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  // Modal overlay
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = 0;
+  overlay.style.left = 0;
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = 9999;
+
+  // Modal content
+  const modal = document.createElement("div");
+  modal.style.background = "#fff";
+  modal.style.padding = "20px";
+  modal.style.borderRadius = "10px";
+  modal.style.minWidth = "300px";
+  modal.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
+
+  modal.innerHTML = `
+    <h3>Edit Course</h3>
+    <label>Title:</label><br>
+    <input id="edit-title" value="${course.title}" /><br><br>
+    
+    <label>Description:</label><br>
+    <textarea id="edit-desc">${course.description}</textarea><br><br>
+
+    <label>Image URL:</label><br>
+    <input id="edit-img" value="${course.imageURL}" /><br><br>
+
+    <label>Price:</label><br>
+    <input id="edit-price" type="number" value="${course.price}" /><br><br>
+
+    <label>Published:</label>
+    <input type="checkbox" id="edit-pub" ${course.IsPublished ? "checked" : ""} /><br><br>
+
+    <button id="save-btn">Save</button>
+    <button id="cancel-btn">Cancel</button>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  // Cancel button
+  modal.querySelector("#cancel-btn").onclick = () => {
+    overlay.remove();
+  };
+
+  // Save button
+  modal.querySelector("#save-btn").onclick = async () => {
+    const updatedData = {
+      title: document.getElementById("edit-title").value,
+      description: document.getElementById("edit-desc").value,
+      imageURL: document.getElementById("edit-img").value,
+      price: parseFloat(document.getElementById("edit-price").value),
+      IsPublished: document.getElementById("edit-pub").checked,
+      courseId: course._id
+    };
+
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put("http://localhost:3000/admin/course/edit", updatedData, {
+        headers: {
+          "token":token,
+          "Content-Type": "application/json"
+        }
+      });
+
+      console.log("Course updated successfully!");
+      overlay.remove();
+      location.reload(); // optional: refresh to see updated list
+    } catch (err) {
+      console.error("Update failed", err);
+    }
+  };
+});
+
+
+
+      });
+    }
+    catch(err){
+      main.innerText = `${err}`;
+    }
+  }
+
+  window.onload = fetchCourse; 
+
+
+function addCourse() {
+  let popup_window = document.createElement("div");
+  popup_window.style.position = "fixed";
+  popup_window.style.top = 0;
+  popup_window.style.left = 0;
+  popup_window.style.width = "100vw";
+  popup_window.style.height = "100vh";
+  popup_window.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+  popup_window.style.display = "flex";
+  popup_window.style.justifyContent = "center";
+  popup_window.style.alignItems = "center";
+  popup_window.style.zIndex = 9999;
+
+  const modal = document.createElement("div");
+  modal.style.background = "#fff";
+  modal.style.padding = "20px";
+  modal.style.borderRadius = "10px";
+  modal.style.minWidth = "300px";
+  modal.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
+
+  modal.innerHTML = `
+    <h3>Edit Course</h3>
+    <form id="edit-course-form">
+      <label for="title">Title</label>
+      <input type="text" id="title" name="title" value="Course Title 1" required />
+
+      <label for="description">Description</label>
+      <textarea id="description" name="description" required>This is a sample course description.</textarea>
+
+      <label for="price">Price (USD)</label>
+      <input type="number" id="price" name="price" value="99" min="0" step="0.01" required />
+
+      <label for="imageURL">Image URL</label>
+      <input type="text" id="imageURL" name="imageURL" value="https://example.com/image.jpg" />
+
+      <label>
+        <input type="checkbox" id="IsPublished" name="isPublished" checked />
+        Published
+      </label>
+
+      <div style="display:flex; gap:10px; margin-top: 15px;">
+        <button type="submit" id="save" style="background:#27ae60; color:white; padding:10px 20px; border:none; border-radius:5px;">Save</button>
+        <button type="button" id="cancel" style="background:#c0392b; color:white; padding:10px 20px; border:none; border-radius:5px;">Cancel</button>
+      </div>
+    </form>
+  `;
+
+  popup_window.appendChild(modal);
+  document.body.appendChild(popup_window);
+
+  // Cancel button
+  modal.querySelector("#cancel").onclick = () => document.body.removeChild(popup_window);
+
+  // Form submission
+  modal.querySelector("#edit-course-form").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const course = {
+      title: document.getElementById("title").value,
+      description: document.getElementById("description").value,
+      price: document.getElementById("price").value,
+      imageURL: document.getElementById("imageURL").value,
+      IsPublished: document.getElementById("IsPublished").checked,
+    };
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post("http://localhost:3000/admin/course", course, {
+        headers: {
+          token: token,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Course updated successfully:", res.data.message);
+      console.log("Course added!");
+      document.body.removeChild(popup_window);
+      location.reload();
+    } catch (err) {
+      console.error("Unauthorized access:", err);
+      alert("Error adding course. Check console for details.");
+    }
+  };
+}
+
+</script>
+</html>
