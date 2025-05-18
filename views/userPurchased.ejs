@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course-App</title>
+    <style>
+        * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f9fc;
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background-color: #2c3e50;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    
+    main {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    
+    .course-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+    }
+
+
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .course-image {
+      width: 100%;
+      height: 140px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 15px;
+      background-color: #ddd;
+    }
+
+    .course-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .course-description {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 15px;
+      flex-grow: 1;
+    }
+
+    .course-price {
+      font-weight: 700;
+      color: #27ae60;
+      margin-bottom: 15px;
+    }
+    
+        .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s ease;
+      color: white;
+      text-align: center;
+      user-select: none;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+     .btn.ViewNow {
+      background-color: #2980b9;
+    }
+
+    .btn.ViewNow:hover {
+      background-color: #1c5985;
+    }
+
+    .btn.Watchlater {
+      background-color: #c0392b;
+    }
+
+    .btn.Watchlater:hover {
+      background-color: #822419;
+    }
+
+    .aside{
+        position: fixed;
+        left: 0%;
+        top: 8%;
+        background: #2c3e50;
+        height:90vh;
+        width: 10vw;
+     display: flex;
+        justify-content: space-around;
+    }
+    li{
+        list-style: none;
+        font-size: larger;
+        margin: 80% 0%;
+    }
+    .list>li>a{
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    </style>
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+       <header>
+<h1>Your Purchased Courses</h1>
+        </header>
+    <main>
+
+
+    </main>
+    <footer>
+
+    </footer>
+
+</body>
+<script>
+ async function fethcPurchaseCourses(){
+    const token = localStorage.getItem("token");
+    if(!token){
+      window.location.href = "/user";
+      alert("unauthorised acesss");
+      return;
+  }
+  try{
+console.log("inside try block")
+console.log(token);
+    const res = await axios.get("http://localhost:3000/user/purchasedCourse",{
+      headers:{
+  "token":token,
+  "Content-type":"application/json"
+}
+    });
+console.log("promise done")
+    const main = document.querySelector('main');
+    const courseData = res.data.courseData;
+
+    courseData.forEach(course=>{
+        const articleEl  = document.createElement("article");
+        articleEl.setAttribute("class","course-card");
+        
+        const imgEl = document.createElement("img");
+        imgEl.setAttribute("class","course-image");
+        imgEl.setAttribute("alt",course.title);
+        imgEl.setAttribute("src","https://img.freepik.com/free-vector/laptop-with-program-code-isometric-icon-software-development-programming-applications-dark-neon_39422-971.jpg?ga=GA1.1.401802642.1716019925&semt=ais_hybrid&w=740");
+
+        const h2El = document.createElement("h2");
+        h2El.setAttribute("class","course-title");
+        h2El.innerText = course.title;
+
+         const descEl = document.createElement("p");
+        descEl.setAttribute("class", "course-description");
+        descEl.innerText = course.description;
+
+           const priceEl = document.createElement("p");
+        priceEl.setAttribute("class", "course-price");
+        priceEl.innerText = `$${course.price}`;
+
+        const buttonsDiv = document.createElement("div");
+        buttonsDiv.setAttribute("class", "buttons");
+
+        const ViewNowButton = document.createElement("button");
+        ViewNowButton.setAttribute("class", "btn ViewNow");
+        ViewNowButton.innerText = "View Now";
+        ViewNowButton.addEventListener("click", () => purchase(course._id));
+
+        const WatchLaterButton = document.createElement("button");
+        WatchLaterButton.setAttribute("class","btn Watchlater");
+        WatchLaterButton.innerText ="Watch Later";
+
+        buttonsDiv.appendChild(ViewNowButton);
+        buttonsDiv.appendChild(WatchLaterButton);
+
+        articleEl.appendChild(imgEl);
+        articleEl.appendChild(h2El);
+        articleEl.appendChild(descEl);
+        articleEl.appendChild(priceEl);
+        articleEl.appendChild(buttonsDiv);
+
+         main.appendChild(articleEl);
+
+    })
+
+  }catch(err){
+    console.log(err);
+  }
+
+}
+window.onload = fethcPurchaseCourses;
+</script>
+</html>
