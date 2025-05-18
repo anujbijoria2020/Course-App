@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Course-App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 300px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .box {
+      display: none;
+    }
+
+    .box.active {
+      display: block;
+    }
+
+    .input-group {
+      margin: 10px 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .toggle-links {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .toggle-links a {
+      cursor: pointer;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .toggle-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h2 id="title">Sign In</h2>
+
+    <!-- Sign In Box -->
+    <form id="signin-box" class="box active" onsubmit="signinUser(event)">
+      <div class="input-group">
+        <input type="text" name="email" placeholder="Email" required>
+      </div>
+      <div class="input-group">
+        <input type="password" name="password" placeholder="Password" required>
+      </div>
+      <button type="submit">Sign In</button>
+    </form>
+
+    <!-- Signup Box -->
+    <form id="signup-box" class="box" onsubmit="signupUser(event)">
+      <div class="input-group">
+        <input type="text" name="email" placeholder="Email" required>
+      </div>
+      <div class="input-group">
+        <input type="password" name="password" placeholder="Password" required>
+      </div>
+      <div class="input-group">
+        <input type="text" name="firstName" placeholder="First Name" required>
+      </div>
+      <div class="input-group">
+        <input type="text" name="lastName" placeholder="Last Name" required>
+      </div>
+      <button type="submit">Sign Up</button>
+    </form>
+
+    <!-- Navigation Links -->
+    <div class="toggle-links">
+      <a onclick="showBox('signin')">Sign In</a> |
+      <a onclick="showBox('signup')">Sign Up</a>
+    </div>
+  </div>
+
+  <script>
+    function showBox(box) {
+      const signinBox = document.getElementById('signin-box');
+      const signupBox = document.getElementById('signup-box');
+      const title = document.getElementById('title');
+
+      signinBox.classList.remove('active');
+      signupBox.classList.remove('active');
+
+      if (box === 'signin') {
+        signinBox.classList.add('active');
+        title.textContent = 'Sign In';
+      } else {
+        signupBox.classList.add('active');
+        title.textContent = 'Sign Up';
+      }
+    }
+
+    async function signupUser(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+
+      const payload = {
+        email: formData.get('email'),
+        password: formData.get('password'),
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName')
+      };
+
+      try {
+        const res = await axios.post('http://localhost:3000/user/signup', payload);
+        alert(res.data.message);
+      } catch (err) {
+    const errorMsg = err.response?.data?.message || "Signup failed";
+    alert(errorMsg);
+    console.error(err);
+  }
+}
+    
+
+    async function signinUser(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+
+      const payload = {
+        email: formData.get('email'),
+        password: formData.get('password')
+      };
+
+      try {
+        const res = await axios.post('http://localhost:3000/user/signin', payload);
+        alert(res.data.message);
+        const token = res.data.token;
+        window.localStorage.setItem("token",token);
+
+      } catch (err) {
+    const errorMsg = err.response?.data?.message || "Signin failed";
+    alert(errorMsg);
+    console.error(err);
+  }
+  finally
+  {
+    window.location.href = "user/panel"
+  }
+}
+    
+  </script>
+</body>
+</html>
